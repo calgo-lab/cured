@@ -1,0 +1,19 @@
+[project]
+name = "error-demo"
+version = "0.1.0"
+description = "Demonstrator for tab-err, conformal data cleaning, MechDetect, and XAI."
+readme = "README.md"
+requires-python = ">=3.10"
+
+authors = [
+  { name = "Nicholas Chandler", email = "nich1834@bht-berlin.de" },
+]
+
+dependencies = [
+  "tab-err",
+  "streamlit",
+  "itables",
+  "pandas",
+  "numpy",
+  "plotly"
+]
