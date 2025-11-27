@@ -1,6 +1,9 @@
-def main():
-    print("Hello from error-demo!")
-
+# Run with: python main.py
+import subprocess
+import sys
 
 if __name__ == "__main__":
-    main()
+    subprocess.run(
+        [sys.executable, "-m", "streamlit", "run", "app/main.py"],
+        check=True
+    )

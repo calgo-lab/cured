@@ -15,5 +15,6 @@ dependencies = [
   "itables",
   "pandas",
   "numpy",
-  "plotly"
+  "plotly",
+  "openpyxl"
 ]
