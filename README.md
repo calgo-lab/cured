@@ -1,5 +1,12 @@
 # error-demo
 
+
+### Usage 
+
+1. `uv sync`
+2. `source .venv/bin/activate`
+3. `python3 main.py`
+
 Notes from the chat with Felix:
 
 yeah, it's all ready in my head. 
@@ -16,3 +23,5 @@ there will be like 3 components:
 3) cleaning with Conformal Data Cleaning
  
 and maybe 4) detection of error mechanisms and positions, if possible also an explanation of individual errors with XAI on top of CDC (that's an ongoing master's thesis)
+
+
