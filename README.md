@@ -17,11 +17,9 @@ Streamlit — Interactive Tables
 there will be like 3 components: 
  
 1) table upload or example chosen by us
- 
+
 2) error injection with tab_err (btw, maybe we can still find a better name ... )
- 
+
 3) cleaning with Conformal Data Cleaning
- 
-and maybe 4) detection of error mechanisms and positions, if possible also an explanation of individual errors with XAI on top of CDC (that's an ongoing master's thesis)
 
-
+4) detection of error mechanisms and positions, if possible also an explanation of individual errors with XAI on top of CDC (that's an ongoing master's thesis)
