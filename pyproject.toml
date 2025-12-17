@@ -13,8 +13,13 @@ dependencies = [
   "tab-err",
   "streamlit",
   "itables",
-  "pandas",
-  "numpy",
   "plotly",
   "openpyxl",
+  "numpy>=2.0.2",
+  "openml>=0.15.1",
+  "pandas>=2.3.3",
+  "quantile-forest>=1.4.1",
+  "scikit-learn>=1.6.1",
+  "typer-slim>=0.20.0",
+  "conformal-data-cleaning @ git+https://github.com/calgo-lab/conformal-data-cleaning.git@refactoring"
 ]
