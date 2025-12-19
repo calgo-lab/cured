@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from sklearn.model_selection import train_test_split
-import random
+import copy
 
 def _split_and_store(df, train_frac=0.8, seed=42):
     train_df, test_df = train_test_split(
@@ -14,6 +14,7 @@ def _split_and_store(df, train_frac=0.8, seed=42):
     st.session_state.dataset = df
     st.session_state.train_df = train_df.reset_index(drop=True)
     st.session_state.test_df = test_df.reset_index(drop=True)
+    st.session_state.clean_test_df = copy.deepcopy(test_df)
     return train_df, test_df
 
 
@@ -55,28 +56,12 @@ def load_dataset():
         st.success("Dataset loaded from file.")
 
     if load_dummy:
-        df = make_dummy_dataset()
+        df = load_dummy_dataset()
         train, test = _split_and_store(df)
         st.success("Dummy dataset loaded.")
 
     return test
 
 
-def make_dummy_dataset(n=100):
-    base_age = [22, 35, 58, 41, 19, 63]
-    base_income = [35000, 72000, 54000, 61000, 29000, 83000]
-    base_city = ["Berlin", "Paris", "Berlin", "Rome", "Madrid", "Vienna"]
-    base_children = [False, True, True, False, False, True]
-
-    ages = [random.choice(base_age) + random.randint(-2, 2) for _ in range(n)]
-    incomes = [random.choice(base_income) + random.randint(-5000, 5000) for _ in range(n)]
-    cities = [random.choice(base_city) for _ in range(n)]
-    has_children = [random.choice(base_children) for _ in range(n)]
-
-    print(len(has_children))
-    return pd.DataFrame({
-        "age": ages,
-        "income": incomes,
-        "city": cities,
-        "has_children": has_children
-    })
+def load_dummy_dataset():
+    return pd.read_csv("data/31.csv").sample(200)

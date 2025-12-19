@@ -21,5 +21,6 @@ dependencies = [
   "quantile-forest>=1.4.1",
   "scikit-learn>=1.6.1",
   "typer-slim>=0.20.0",
-  "conformal-data-cleaning @ git+https://github.com/calgo-lab/conformal-data-cleaning.git@refactoring"
+  "conformal-data-cleaning @ git+https://github.com/calgo-lab/conformal-data-cleaning.git@refactoring",
+  "mechdetect @ git+https://github.com/calgo-lab/MechDetect.git@8c7505a"
 ]

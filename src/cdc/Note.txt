@@ -1,1 +1,0 @@
-This code comes from Sebastian's private dissertation repo (https://github.com/se-jaeger/dissertation-experiments) at commit hash: d38cef9

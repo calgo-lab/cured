@@ -1,7 +1,5 @@
 import streamlit as st
-from itables.streamlit import interactive_table
 from tab_err.api.high_level import create_errors
-import pandas as pd
 
 def highlight_errors(df, mask):
     # map each element of the mask to a CSS string
@@ -29,7 +27,7 @@ def inject_errors_ui(df):
     # User specifies error rate
     error_rate = st.slider(
         "Error rate (% of cells)", min_value=0, max_value=100, value=10, step=1
-    ) / 100
+    ) /100
 
     # Buttons side by side
     col1, col2 = st.columns(2)
