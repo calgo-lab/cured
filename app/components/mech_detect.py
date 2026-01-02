@@ -33,7 +33,7 @@ def mech_detect_ui():
     st.subheader("MechDetect Settings")
     alpha = st.slider(
         "Significance level (α)",
-        min_value=0.01, max_value=0.3, value=0.1, step=0.01,
+        min_value=0.01, max_value=0.3, value=0.05, step=0.01,
         help="The significance level for the tests in MechDetect"
     )
     n_cv = st.number_input(
@@ -76,6 +76,8 @@ def mech_detect_ui():
 
                 # Display a clean summary
                 st.markdown(f"**Detected mechanism:** `{detected_mech}`")
+
+                st.markdown(f"**Actual error mechanism:** `{st.session_state.perturbation_config.columns[column][0].error_mechanism}`")
 
                 col1, col2 = st.columns(2)
                 col1.metric("p1", f"{p1:.4f}")

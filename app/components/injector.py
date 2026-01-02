@@ -1,5 +1,5 @@
 import streamlit as st
-from tab_err.api.high_level import create_errors
+from tab_err.api.high_level import create_errors_with_config
 
 def highlight_errors(df, mask):
     # map each element of the mask to a CSS string
@@ -40,10 +40,11 @@ def inject_errors_ui(df):
         df_copy = st.session_state.original_dataset.copy()        
         
         # TODO: Replace with tab-err injection logic
-        perturbed_df, error_mask = create_errors(df_copy, error_rate=error_rate)
+        perturbed_df, error_mask, config = create_errors_with_config(df_copy, error_rate=error_rate)
 
         st.session_state.dataset = perturbed_df
         st.session_state.error_mask = error_mask
+        st.session_state.perturbation_config = config
         if error_mask.any().any():
             st.success(f"Injected errors at {error_rate * 100}%.")
         else:

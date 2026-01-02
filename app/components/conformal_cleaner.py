@@ -103,6 +103,16 @@ def conformal_cleaning_ui():
             st.session_state.error_mask,
             st.session_state.clean_mask
         )
+        # === Legend ===
+        st.markdown(
+            """
+            **Legend:**  
+            <span style="background-color:#ff6b6b;color:white;padding:2px 6px;border-radius:3px;">Error only</span>  
+            <span style="background-color:#3498db;color:white;padding:2px 6px;border-radius:3px;">CDC Modified</span>  
+            <span style="background-color:#03fc24;color:black;padding:2px 6px;border-radius:3px;">Error & CDC Modified</span>
+            """,
+            unsafe_allow_html=True
+        )
         st.dataframe(styled_df)
 
 

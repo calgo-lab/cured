@@ -714,7 +714,7 @@ dependencies = [
 requires-dist = [
     { name = "conformal-data-cleaning", git = "https://github.com/calgo-lab/conformal-data-cleaning.git?rev=refactoring" },
     { name = "itables" },
-    { name = "mechdetect", git = "https://github.com/calgo-lab/MechDetect.git?rev=8c7505a" },
+    { name = "mechdetect", git = "https://github.com/calgo-lab/MechDetect.git?rev=d91ffc1" },
     { name = "numpy", specifier = ">=2.0.2" },
     { name = "openml", specifier = ">=0.15.1" },
     { name = "openpyxl" },
@@ -723,7 +723,7 @@ requires-dist = [
     { name = "quantile-forest", specifier = ">=1.4.1" },
     { name = "scikit-learn", specifier = ">=1.6.1" },
     { name = "streamlit" },
-    { name = "tab-err" },
+    { name = "tab-err", git = "https://github.com/calgo-lab/tab_err.git?rev=18c2c6d" },
     { name = "typer-slim", specifier = ">=0.20.0" },
 ]
 
@@ -1348,7 +1348,7 @@ wheels = [
 [[package]]
 name = "mechdetect"
 version = "0.1.0"
-source = { git = "https://github.com/calgo-lab/MechDetect.git?rev=8c7505a#8c7505a60a5d65460f928021f09737d93d963772" }
+source = { git = "https://github.com/calgo-lab/MechDetect.git?rev=d91ffc1#d91ffc1ccbca23dc424fbe9ebe94c6f806e578db" }
 dependencies = [
     { name = "catboost" },
     { name = "ipykernel" },
@@ -2562,14 +2562,10 @@ wheels = [
 
 [[package]]
 name = "tab-err"
-version = "0.2.0"
-source = { registry = "https://pypi.org/simple" }
+version = "0.2.1"
+source = { git = "https://github.com/calgo-lab/tab_err.git?rev=18c2c6d#18c2c6d68a62727303bafdd1129c1dcc6fea1d67" }
 dependencies = [
     { name = "pandas" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/4f/84/72570d39ae3b0d24802994fe3fb0b2e9c3d4ec4040cbc75e94cfbb38e1b9/tab_err-0.2.0.tar.gz", hash = "sha256:069c6b3d422382fd6be1cb4b0eddf3432a347aff07d9c9db972ed577f5e4e52a", size = 23499, upload-time = "2025-05-07T14:14:07.69Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/40/a6/249217a25ace948677a8d1b246aede26b9427f13939617dde5f86143217b/tab_err-0.2.0-py3-none-any.whl", hash = "sha256:63b45f04cc488ea8ecaf4dfb54a9172c8bb644ada486614893e0c7ab65ac4c6d", size = 38761, upload-time = "2025-05-07T14:14:06.091Z" },
 ]
 
 [[package]]
