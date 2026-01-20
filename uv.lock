@@ -474,14 +474,17 @@ wheels = [
 [[package]]
 name = "conformal-data-cleaning"
 version = "0.1.0"
-source = { git = "https://github.com/calgo-lab/conformal-data-cleaning.git?rev=refactoring#3759e63c7222f50e513f3fa4b41d339faae9beee" }
+source = { git = "https://github.com/calgo-lab/conformal-data-cleaning.git?rev=d3d0008#d3d00081d895185b8222969d563a25ffdde50c5d" }
 dependencies = [
     { name = "autogluon-tabular" },
     { name = "ipykernel" },
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "numpy", version = "2.3.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "openml" },
     { name = "pandas" },
+    { name = "quantile-forest" },
     { name = "tab-err" },
+    { name = "typer-slim" },
     { name = "typing-extensions" },
 ]
 
@@ -712,7 +715,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "conformal-data-cleaning", git = "https://github.com/calgo-lab/conformal-data-cleaning.git?rev=refactoring" },
+    { name = "conformal-data-cleaning", git = "https://github.com/calgo-lab/conformal-data-cleaning.git?rev=d3d0008" },
     { name = "itables" },
     { name = "mechdetect", git = "https://github.com/calgo-lab/MechDetect.git?rev=d91ffc1" },
     { name = "numpy", specifier = ">=2.0.2" },

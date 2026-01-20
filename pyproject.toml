@@ -21,7 +21,7 @@ dependencies = [
   "quantile-forest>=1.4.1",
   "scikit-learn>=1.6.1",
   "typer-slim>=0.20.0",
-  "conformal-data-cleaning @ git+https://github.com/calgo-lab/conformal-data-cleaning.git@refactoring",  #51b12e0
+  "conformal-data-cleaning @ git+https://github.com/calgo-lab/conformal-data-cleaning.git@d3d0008",  #
   "mechdetect @ git+https://github.com/calgo-lab/MechDetect.git@d91ffc1",
   "openml"
 ]

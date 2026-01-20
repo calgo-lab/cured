@@ -2,7 +2,8 @@
 import pandas as pd
 import streamlit as st
 import numpy as np
-from conformal_data_cleaning.cleaner.autogluon import ConformalAutoGluonCleaner
+from conformal_data_cleaning.demo_interface import fit_and_get_cleaner
+from conformal_data_cleaning.cleaner import ConformalForestCleaner
 
 def highlight_errors(df, error_mask, clean_mask):
     """
@@ -87,50 +88,9 @@ def conformal_clean(
     Output:
         Cleaned dataframe
     """
-    model_hps = {"hyperparameters": {"RF": {}}}
-    cleaner: ConformalAutoGluonCleaner = ConformalAutoGluonCleaner(confidence_level=c_level, seed = seed)
-    fit_cleaner = cleaner.fit(train_df, ci_ag_fit_params=model_hps)
+
+    fit_cleaner = fit_and_get_cleaner(cleaner=ConformalForestCleaner.__name__, train_df=train_df, confidence_level=c_level, seed=seed)
     cleaned_test_df, cleaned_mask = fit_cleaner.transform(test_df)
-
-    # Analysis
-    coverages = []
-    empty_set_fractions = []
-    average_set_sizes = []
-    relative_average_set_sizes = []
-
-    # Get categorical and numerical columns
-    categorical_cols = [c for c in train_df.columns if is_categorical(train_df[c])]
-    numerical_cols = [c for c in train_df.columns if not is_categorical(train_df[c])]
-
-    for column_name, prediction_sets in cleaner._prediction_sets.items():
-        if column_name in categorical_cols:
-            cardinality = len(train_df[column_name].unique())
-            true_value_in_prediction_set = np.any(
-                prediction_sets == test_df[column_name].to_numpy()[:, np.newaxis], axis=1
-            )
-            coverages.append(true_value_in_prediction_set.mean())
-
-            average_set_sizes.append((~pd.DataFrame(prediction_sets).isna()).sum(axis=1).mean())
-            relative_average_set_sizes.append(average_set_sizes[-1] / cardinality)
-            empty_set_fractions.append(((~pd.DataFrame(prediction_sets).isna()).sum(axis=1) == 0).mean())
-
-        elif column_name in numerical_cols:
-            value_range = (
-                train_df[column_name].max()
-                - train_df[column_name].min()
-            )
-            true_value_in_prediction_range = (test_df[column_name].to_numpy() >= prediction_sets[:, 0]) & (
-                test_df[column_name].to_numpy() <= prediction_sets[:, 1]
-            )
-            coverages.append(true_value_in_prediction_range.mean())
-            average_set_sizes.append((prediction_sets[:, 1] - prediction_sets[:, 0]).mean())
-            relative_average_set_sizes.append(average_set_sizes[-1] / value_range)
-            empty_set_fractions.append(((prediction_sets[:, 1] - prediction_sets[:, 0]) == 0).mean())
-
-    st.session_state.coverages = coverages
-    st.session_state.empty_set_fraction = empty_set_fractions
-    st.session_state.average_set_sizes = average_set_sizes
-    st.session_state.relative_average_set_sizes = relative_average_set_sizes
 
     return cleaned_test_df, cleaned_mask
 
@@ -166,10 +126,6 @@ def conformal_cleaning_ui():
         st.session_state.cleaned_dataset = cleaned_df
         st.session_state.clean_mask = mask
 
-
-
-        cleaner_prop_correct = (st.session_state.error_mask & st.session_state.clean_mask).values.sum() / st.session_state.clean_mask.values.sum()
-        st.session_state.cleaner_prop_correct = cleaner_prop_correct
         st.success("Cleaning completed.")
 
     # === Visualization ===
@@ -178,10 +134,7 @@ def conformal_cleaning_ui():
         error_detection_tpr = (st.session_state.error_mask & st.session_state.clean_mask).sum().sum() / number_of_errors
         error_detection_fpr = (~st.session_state.error_mask & st.session_state.clean_mask).sum().sum() / (~st.session_state.error_mask).sum().sum()
         
-        st.metric(
-            label="Coverage averaged over columns",
-            value=f"{np.mean(st.session_state.coverages):.2%}"
-        )
+        # Makes us look bad
         st.metric(
             label="TPR",
             value=f"{error_detection_tpr:.2%}"
