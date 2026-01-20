@@ -1,6 +1,7 @@
 # components/conformal_cleaner.py
 import pandas as pd
 import streamlit as st
+import numpy as np
 from conformal_data_cleaning.cleaner.autogluon import ConformalAutoGluonCleaner
 
 def highlight_errors(df, error_mask, clean_mask):
@@ -36,13 +37,45 @@ def highlight_errors(df, error_mask, clean_mask):
     return df.style.apply(styler_func, axis=None)
 
 
+def is_categorical(
+    column: pd.Series,
+    n_samples: int = 1000,
+    max_unique_fraction: float = 0.2,
+    random_generator: None = None,
+) -> bool:
+    """Check if `column` type is categorical.
+
+    A heuristic to check whether a `column` is categorical:
+    a column is considered categorical (as opposed to a plain text column)
+    if the relative cardinality is `max_unique_fraction` or less.
+
+    Args:
+        column (ArrayLike): pandas `Series` containing strings
+        n_samples (int, optional): number of samples used for heuristic. Defaults to 1000.
+        max_unique_fraction (float, optional): maximum relative cardinality. Defaults to 0.2.
+        random_generator (Generator, optional): random generator. Defaults to None.
+
+    Returns:
+        bool: `True` if the column is categorical according to the heuristic.
+    """
+    if random_generator is None:
+        random_generator = np.random.default_rng()
+
+    column = np.array(column)
+    n_samples = min(n_samples, len(column))
+    values, counts = np.unique(column, return_counts=True)
+    sample = random_generator.choice(a=values, p=counts / counts.sum(), size=n_samples)
+    unique_samples = np.unique(sample)
+
+    return unique_samples.shape[0] / n_samples <= max_unique_fraction
+
 
 def conformal_clean(
     test_df: pd.DataFrame,
     train_df: pd.DataFrame,
     c_level: float,
     njobs: int = 4,
-    seed:int = 42
+    seed:int = 41
 ):
     """
 
@@ -58,6 +91,46 @@ def conformal_clean(
     cleaner: ConformalAutoGluonCleaner = ConformalAutoGluonCleaner(confidence_level=c_level, seed = seed)
     fit_cleaner = cleaner.fit(train_df, ci_ag_fit_params=model_hps)
     cleaned_test_df, cleaned_mask = fit_cleaner.transform(test_df)
+
+    # Analysis
+    coverages = []
+    empty_set_fractions = []
+    average_set_sizes = []
+    relative_average_set_sizes = []
+
+    # Get categorical and numerical columns
+    categorical_cols = [c for c in train_df.columns if is_categorical(train_df[c])]
+    numerical_cols = [c for c in train_df.columns if not is_categorical(train_df[c])]
+
+    for column_name, prediction_sets in cleaner._prediction_sets.items():
+        if column_name in categorical_cols:
+            cardinality = len(train_df[column_name].unique())
+            true_value_in_prediction_set = np.any(
+                prediction_sets == test_df[column_name].to_numpy()[:, np.newaxis], axis=1
+            )
+            coverages.append(true_value_in_prediction_set.mean())
+
+            average_set_sizes.append((~pd.DataFrame(prediction_sets).isna()).sum(axis=1).mean())
+            relative_average_set_sizes.append(average_set_sizes[-1] / cardinality)
+            empty_set_fractions.append(((~pd.DataFrame(prediction_sets).isna()).sum(axis=1) == 0).mean())
+
+        elif column_name in numerical_cols:
+            value_range = (
+                train_df[column_name].max()
+                - train_df[column_name].min()
+            )
+            true_value_in_prediction_range = (test_df[column_name].to_numpy() >= prediction_sets[:, 0]) & (
+                test_df[column_name].to_numpy() <= prediction_sets[:, 1]
+            )
+            coverages.append(true_value_in_prediction_range.mean())
+            average_set_sizes.append((prediction_sets[:, 1] - prediction_sets[:, 0]).mean())
+            relative_average_set_sizes.append(average_set_sizes[-1] / value_range)
+            empty_set_fractions.append(((prediction_sets[:, 1] - prediction_sets[:, 0]) == 0).mean())
+
+    st.session_state.coverages = coverages
+    st.session_state.empty_set_fraction = empty_set_fractions
+    st.session_state.average_set_sizes = average_set_sizes
+    st.session_state.relative_average_set_sizes = relative_average_set_sizes
 
     return cleaned_test_df, cleaned_mask
 
@@ -93,10 +166,33 @@ def conformal_cleaning_ui():
         st.session_state.cleaned_dataset = cleaned_df
         st.session_state.clean_mask = mask
 
+
+
+        cleaner_prop_correct = (st.session_state.error_mask & st.session_state.clean_mask).values.sum() / st.session_state.clean_mask.values.sum()
+        st.session_state.cleaner_prop_correct = cleaner_prop_correct
         st.success("Cleaning completed.")
 
     # === Visualization ===
     if st.session_state.cleaned_dataset is not None:
+        number_of_errors = st.session_state.error_mask.sum().sum()
+        error_detection_tpr = (st.session_state.error_mask & st.session_state.clean_mask).sum().sum() / number_of_errors
+        error_detection_fpr = (~st.session_state.error_mask & st.session_state.clean_mask).sum().sum() / (~st.session_state.error_mask).sum().sum()
+        
+        st.metric(
+            label="Coverage averaged over columns",
+            value=f"{np.mean(st.session_state.coverages):.2%}"
+        )
+        st.metric(
+            label="TPR",
+            value=f"{error_detection_tpr:.2%}"
+        )
+        st.metric(
+            label="FPR",
+            value=f"{error_detection_fpr:.2%}"
+        )
+
+
+
         st.markdown("### Cleaned dataset")
         styled_df = highlight_errors(
             st.session_state.cleaned_dataset,
@@ -115,6 +211,7 @@ def conformal_cleaning_ui():
         )
         st.dataframe(styled_df)
 
+        
 
     else:
         st.info("Run the cleaner to view cleaned data.")
