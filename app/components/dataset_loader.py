@@ -1,7 +1,39 @@
 import streamlit as st
 import pandas as pd
+import hashlib
 from sklearn.model_selection import train_test_split
 import copy
+
+def _file_hash(file) -> str:
+    """
+    Stable hash for detecting new uploads
+    """
+    return hashlib.md5(file.getvalue()).hexdigest()
+
+def _reset_dataset_state():
+    """
+    Clears all session_state keys that depend on the dataset
+    """
+    keys_to_clear = [
+        # Core dataset
+        "dataset",
+        "train_df",
+        "test_df",
+        "clean_test_df",
+        "original_dataset",
+
+        # Error injection
+        "error_mask",
+        "perturbation_config",
+
+        # Conformal cleaning
+        "cleaned_dataset",
+        "clean_mask",
+    ]
+
+    for k in keys_to_clear:
+        st.session_state.pop(k, None)
+
 
 def _split_and_store(df, train_frac=0.8, seed=42):
     train_df, test_df = train_test_split(
@@ -51,14 +83,32 @@ def load_dataset():
     test = None
 
     if uploaded is not None:
-        df = pd.read_csv(uploaded) if uploaded.name.endswith(".csv") else pd.read_excel(uploaded)
-        train, test = _split_and_store(df)
-        st.success("Dataset loaded from file.")
+        current_hash = _file_hash(uploaded)
+
+        if st.session_state.get("dataset_hash") != current_hash:
+            _reset_dataset_state()
+            st.session_state.dataset_hash = current_hash
+
+            df = (
+                pd.read_csv(uploaded)
+                if uploaded.name.endswith(".csv")
+                else pd.read_excel(uploaded)
+            )
+
+            train, test = _split_and_store(df)
+            st.success("New dataset loaded and session state reset.")
+
 
     if load_dummy:
-        df = load_dummy_dataset()
-        train, test = _split_and_store(df)
-        st.success("Dummy dataset loaded.")
+        dummy_hash = "DUMMY_DATASET"
+
+        if st.session_state.get("dataset_hash") != dummy_hash:
+            _reset_dataset_state()
+            st.session_state.dataset_hash = dummy_hash
+
+            df = load_dummy_dataset()
+            train, test = _split_and_store(df)
+            st.success("Dummy dataset loaded and session state reset.")
 
     return test
 
