@@ -94,6 +94,8 @@ def load_dataset():
                 if uploaded.name.endswith(".csv")
                 else pd.read_excel(uploaded)
             )
+            int_cols = df.select_dtypes(include="int").columns
+            df[int_cols] = df[int_cols].astype("float")
 
             train, test = _split_and_store(df)
             st.success("New dataset loaded and session state reset.")
@@ -107,6 +109,8 @@ def load_dataset():
             st.session_state.dataset_hash = dummy_hash
 
             df = load_dummy_dataset()
+            int_cols = df.select_dtypes(include="int").columns
+            df[int_cols] = df[int_cols].astype("float")
             train, test = _split_and_store(df)
             st.success("Dummy dataset loaded and session state reset.")
 

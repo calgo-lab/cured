@@ -15,12 +15,12 @@ st.title("error-demo")
 st.caption("Tabular Error Injection, Detection & Cleaning Demo")
 
 st.markdown("## 0. About")
-st.markdown("This demo shows how tabular data can be errored and cleaned. Afterwards, it examines the performance of the cleaned dataset on a donwstream ML task using XAI.")
+st.markdown("This demo shows how tabular data can be errored, cleaned, and characterized.")
 
 load_dataset()
 
 if st.session_state.test_df is not None:
     st.markdown("## 2. Dataset Preview")
-    st.dataframe(st.session_state.test_df.head())
+    st.dataframe(st.session_state.test_df)
 else:
     st.info("Upload a CSV or load the built-in dataset to begin.")
