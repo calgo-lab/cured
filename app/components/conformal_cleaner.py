@@ -150,7 +150,7 @@ def conformal_cleaning_ui():
         st.session_state.clean_mask = None
 
     c_level = st.slider(
-        "Confidence Level", min_value=0.0001, max_value=0.9999, value=.95, step=0.001
+        "Confidence Level", min_value=0.0001, max_value=0.9999, value=.99, step=0.001
     )
 
     clean_button = st.button("Run conformal cleaning")
@@ -159,7 +159,7 @@ def conformal_cleaning_ui():
         with st.spinner("Running conformal cleaner..."):
             cleaned_df, mask = conformal_clean(
                 st.session_state.test_df,
-                st.session_state.train_df,
+                st.session_state.dataset,
                 c_level=c_level,
             )
 

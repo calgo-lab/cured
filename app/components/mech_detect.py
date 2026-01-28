@@ -29,18 +29,6 @@ def mech_detect_ui():
     # Let the user select a column
     column = st.selectbox("Select column to detect error mechanism", df.columns)
 
-    # User inputs for MechDetect parameters
-    st.subheader("MechDetect Settings")
-    alpha = st.slider(
-        "Significance level (α)",
-        min_value=0.01, max_value=0.3, value=0.05, step=0.01,
-        help="The significance level for the tests in MechDetect"
-    )
-    n_cv = st.number_input(
-        "Number of cross-validation iterations",
-        min_value=1, max_value=50, value=5, step=1,
-        help="Number of CV folds/iterations for MechDetect"
-    )
 
     # Show dataset preview
     if "error_mask" in st.session_state and st.session_state.error_mask is not None:
@@ -60,7 +48,7 @@ def mech_detect_ui():
 
         with st.spinner(f"Detecting error mechanism in '{column}'..."):
             try:
-                detector = MechDetector(alpha=alpha, cv_folds=n_cv, seed=42, n_jobs=1)
+                detector = MechDetector(alpha=0.05, cv_folds=5, seed=42, n_jobs=1)
                 detected_mech, p1, p2 = detector.detect(
                     st.session_state.clean_test_df,
                     st.session_state.error_mask,
@@ -87,12 +75,4 @@ def mech_detect_ui():
                     col2.metric("p2", f"{p2:.4f}")
                 else:
                     col2.markdown("**p2:** N/A")
-
-                # Optional: also show a simple dataframe summary
-                summary_df = pd.DataFrame({
-                    "Mechanism": [detected_mech],
-                    "p1": [p1],
-                    "p2": [p2 if p2 is not None else "N/A"]
-                })
-                st.table(summary_df)
 
