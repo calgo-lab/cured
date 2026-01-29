@@ -57,7 +57,7 @@ def conformal_clean(
         Cleaned dataframe
     """
 
-    fit_cleaner = fit_and_get_cleaner(cleaner=ConformalForestCleaner.__name__, train_df=train_df, confidence_level=c_level, seed=seed)
+    fit_cleaner = fit_and_get_cleaner(cleaner=ConformalForestCleaner.__name__, train_df=train_df, confidence_level=c_level, seed=seed)  # Autogluon goes here
     cleaned_test_df, cleaned_mask = fit_cleaner.transform(test_df)
 
     return cleaned_test_df, cleaned_mask
@@ -78,7 +78,7 @@ def conformal_cleaning_ui():
         st.session_state.clean_mask = None
 
     c_level = st.slider(
-        "Confidence Level", min_value=0.0001, max_value=0.9999, value=.99, step=0.001
+        "Confidence Level", min_value=0.5, max_value=0.9999, value=.99, step=0.001
     )
 
     clean_button = st.button("Run conformal cleaning")

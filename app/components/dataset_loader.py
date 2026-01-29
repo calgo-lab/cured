@@ -58,7 +58,8 @@ def load_dataset():
     if "test_df" not in st.session_state:
         st.session_state.test_df = None
 
-    st.markdown("## 1. Load Dataset")
+    st.markdown("## Load Dataset")
+
     st.markdown(
         "Upload your own CSV/Excel file or start with an example dataset. "
         "**80%** of the data will be used to train the cleaner; "
@@ -68,7 +69,7 @@ def load_dataset():
     st.markdown("---")
 
     st.markdown("### Option A — Upload a file")
-    uploaded = st.file_uploader(
+    uploaded = st.file_uploader(  # Can configure size using server.maxUploadSize
         "Supports CSV and Excel (.xlsx) files",
         type=["csv", "xlsx"],
         key="uploader"
@@ -76,7 +77,7 @@ def load_dataset():
 
     st.markdown("### Option B — Use an example dataset")
     st.caption(
-        "Loads a small synthetic dataset with numerical and categorical columns."
+        "Loads dataset with the OpenML ID: 44969."
     )
 
     load_dummy = st.button("Load dummy dataset", use_container_width=True)

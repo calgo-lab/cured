@@ -36,10 +36,6 @@ def mech_detect_ui():
     else:
         st.dataframe(df)
 
-
-
-
-
     if st.button("Run MechDetect"):
         if df[column].isnull().all():
             st.error("Selected column has only missing values.")
