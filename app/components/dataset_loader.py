@@ -4,6 +4,10 @@ import hashlib
 from sklearn.model_selection import train_test_split
 import copy
 
+
+MAX_ROWS = 10_000
+MAX_COLS = 10
+
 def _file_hash(file) -> str:
     """
     Stable hash for detecting new uploads
@@ -66,6 +70,8 @@ def load_dataset():
         "**20%** will be held out."
     )
 
+    st.markdown("The dataset is limited to 10,000 rows and 10 columns including a column named `target` for use in the downstream task of the data cleaning section.")
+
     st.markdown("---")
 
     st.markdown("### Option A — Upload a file")
@@ -77,7 +83,7 @@ def load_dataset():
 
     st.markdown("### Option B — Use an example dataset")
     st.caption(
-        "Loads dataset with the OpenML ID: 44969."
+        "Loads a dataset with the OpenML ID: 44969 subsampled to 8 columns."
     )
 
     load_dummy = st.button("Load dummy dataset", use_container_width=True)
@@ -95,6 +101,27 @@ def load_dataset():
                 if uploaded.name.endswith(".csv")
                 else pd.read_excel(uploaded)
             )
+
+            # --- ROW SUBSAMPLE ---
+            if len(df) > MAX_ROWS:
+                df = df.sample(n=MAX_ROWS, random_state=42).reset_index(drop=True)
+
+            # --- COLUMN SUBSAMPLE ---
+            cols = list(df.columns)
+
+            # Always preserve target if present
+            keep = ["target"] if "target" in cols else []
+
+            # Other columns (excluding target)
+            others = [c for c in cols if c != "target"]
+
+            # Subsample remaining columns if needed
+            if len(keep) + len(others) > MAX_COLS:
+                needed = MAX_COLS - len(keep)
+                others = others[:needed]  # deterministic; use .sample(...) if you want randomness
+
+            df = df[keep + others]
+
             int_cols = df.select_dtypes(include="int").columns
             df[int_cols] = df[int_cols].astype("float")
 
@@ -119,4 +146,4 @@ def load_dataset():
 
 
 def load_dummy_dataset():
-    return pd.read_csv("data/44969.csv") # .sample(200)
+    return pd.read_csv("data/44969.csv").drop(columns=["ship_speed", "gas_generator_rate_of_revolutions", "gt_compressor_decay_state_coefficient", "hp_turbine_exit_pressure", "gt_compressor_outlet_air_pressure", "gt_compressor_outlet_air_temperature", "gas_turbine_exhaust_gas_pressure"]) # .sample(200)

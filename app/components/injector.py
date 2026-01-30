@@ -100,8 +100,11 @@ def inject_errors_ui(df):
         "Error rate (% of cells)", min_value=0, max_value=100, value=10, step=1
     ) /100
 
+    # --- CODE STRING ---
+    code_str = "perturbed_df, error_mask = create_errors(df, error_rate=error_rate)"
+
     # Buttons side by side
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, col4, col5 = st.columns(5)
     with col1:
         inject_button = st.button("Inject errors")
     with col2:
@@ -116,6 +119,9 @@ def inject_errors_ui(df):
             for name, desc in ERROR_TYPE_DESCRIPTIONS.items():
                 st.markdown(f"**{name}**")
                 st.caption(desc)
+    with col5:
+        with st.popover("tab-err code"):
+            st.markdown(f"```python\n{code_str}\n```")
 
     if inject_button:
         df_copy = st.session_state.test_df.copy()        
