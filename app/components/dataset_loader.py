@@ -74,22 +74,25 @@ def load_dataset():
 
     st.markdown("---")
 
-    st.markdown("### Option A — Upload a file")
+    st.markdown("### Option A - Use an example dataset")
+    st.caption(
+        "Loads a dataset with the OpenML ID: 44969 subsampled to 8 columns."
+    )
+
+    load_dummy = st.button("Load dummy dataset", use_container_width=True)
+
+    st.markdown("### Option B - Upload a file")
     uploaded = st.file_uploader(  # Can configure size using server.maxUploadSize
         "Supports CSV and Excel (.xlsx) files",
         type=["csv", "xlsx"],
         key="uploader"
     )
 
-    st.markdown("### Option B — Use an example dataset")
-    st.caption(
-        "Loads a dataset with the OpenML ID: 44969 subsampled to 8 columns."
-    )
 
-    load_dummy = st.button("Load dummy dataset", use_container_width=True)
     test = None
 
     if uploaded is not None:
+        # --- RESET FILE POINTER ---
         current_hash = _file_hash(uploaded)
 
         if st.session_state.get("dataset_hash") != current_hash:
@@ -109,8 +112,15 @@ def load_dataset():
             # --- COLUMN SUBSAMPLE ---
             cols = list(df.columns)
 
+            if "target" not in cols:
+                st.error(
+                    "Your dataset must contain a column named **'target'**.\n\n"
+                    "Please rename your label column to **target** and re-upload the file so the full demo works."
+                )
+                st.stop()
+
             # Always preserve target if present
-            keep = ["target"] if "target" in cols else []
+            keep = ["target"]
 
             # Other columns (excluding target)
             others = [c for c in cols if c != "target"]
@@ -146,4 +156,9 @@ def load_dataset():
 
 
 def load_dummy_dataset():
-    return pd.read_csv("data/44969.csv").drop(columns=["ship_speed", "gas_generator_rate_of_revolutions", "gt_compressor_decay_state_coefficient", "hp_turbine_exit_pressure", "gt_compressor_outlet_air_pressure", "gt_compressor_outlet_air_temperature", "gas_turbine_exhaust_gas_pressure"]) # .sample(200)
+    dummy_data = pd.read_csv("data/44969.csv").drop(columns=["ship_speed", "gas_generator_rate_of_revolutions", "hp_turbine_exit_pressure", "gt_compressor_outlet_air_pressure", "gt_compressor_outlet_air_temperature", "gas_turbine_exhaust_gas_pressure", "hp_turbine_exit_temperature"]) # .sample(200)
+    
+    # Reorder columns
+    cols = ["target"] + [c for c in dummy_data.columns if c != "target"]
+    dummy_data = dummy_data[cols]
+    return dummy_data

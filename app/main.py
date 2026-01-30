@@ -15,9 +15,9 @@ st.title("<Paper title goes here>")
 st.caption("Tabular Error Injection, Cleaning, & Characterization Demo")
 
 description = """This demo shows how tabular data can be errored, cleaned, and characterized. It brings together the results of three works on error generation, conformal data cleaning, and error mechanism detection which are explored in detail in the following papers:
-1. Towards Realistic Error Models for Tabular Data - https://doi.org/10.1145/3774914
-2. From Data Imputation to Data Cleaning - Automated Cleaning of Tabular Data Improves Downstream Predictive Performance - https://proceedings.mlr.press/v238/jager24a.html
-3. MechDetect: Detecting Data-Dependent Errors - https://arxiv.org/abs/2512.04138
+1. [Towards Realistic Error Models for Tabular Data](https://doi.org/10.1145/3774914)
+2. [From Data Imputation to Data Cleaning - Automated Cleaning of Tabular Data Improves Downstream Predictive Performance](https://proceedings.mlr.press/v238/jager24a.html)
+3. [MechDetect: Detecting Data-Dependent Errors](https://arxiv.org/abs/2512.04138)
 
 The user can proceed by uploading a dataset (or using the built-in dataset), perturbing the dataset with tab-err, cleaning the dataset with conformal data cleaning, and finally characterizing the distribution of errors using mech detect.
 """

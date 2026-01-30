@@ -68,8 +68,9 @@ def conformal_clean(
 def conformal_cleaning_ui():
     st.markdown("## Conformal Data Cleaning")
     st.markdown(
-        "Clean injected errors using a conformal predictor with "
-        "coverage guarantees."
+        "Clean injected errors using a conformal predictor with coverage guarantees, this uses the library (Link? there is no PyPi). "
+        "The confidence level affects the coverage of the conformal predictor, with higher confidence levels being more conservative; a value of 0.9 or higher is recommended."
+
     )
 
     if "cleaned_dataset" not in st.session_state:
@@ -81,7 +82,20 @@ def conformal_cleaning_ui():
         "Confidence Level", min_value=0.5, max_value=0.9999, value=.99, step=0.001
     )
 
-    clean_button = st.button("Run conformal cleaning")
+    col1, col2 = st.columns(2)
+    code_str = """
+    from conformal_data_cleaning.cleaner import ConformalForestCleaner
+
+    cleaner = ConformalForestCleaner(train_df, confidence_level)
+    
+    cleaned_test_df, cleaned_mask = cleaner.transform(test_df)
+    """
+    
+    with col1:
+        clean_button = st.button("Run conformal cleaning")
+    with col2:
+        with st.expander("Code Example"):
+            st.code(code_str, language="python")
 
     if clean_button:
         with st.spinner("Running conformal cleaner..."):
@@ -94,24 +108,77 @@ def conformal_cleaning_ui():
         st.session_state.cleaned_dataset = cleaned_df
         st.session_state.clean_mask = mask
 
-        st.success("Cleaning completed.")
 
     # === Visualization ===
     if st.session_state.cleaned_dataset is not None:
-        number_of_errors = st.session_state.error_mask.sum().sum()
-        error_detection_tpr = (st.session_state.error_mask & st.session_state.clean_mask).sum().sum() / number_of_errors
+        error_detection_tpr = (st.session_state.error_mask & st.session_state.clean_mask).sum().sum() / st.session_state.error_mask.sum().sum()
         error_detection_fpr = (~st.session_state.error_mask & st.session_state.clean_mask).sum().sum() / (~st.session_state.error_mask).sum().sum()
-        
-        # Makes us look bad
-        st.metric(
-            label="TPR",
-            value=f"{error_detection_tpr:.2%}"
-        )
-        st.metric(
-            label="FPR",
-            value=f"{error_detection_fpr:.2%}"
-        )
 
+
+        # --- METRICS ROW ---
+        m1, m2, m3 = st.columns([1, 1, 2])
+
+        with m1:
+            st.metric("TPR - True Positive Rate", f"{error_detection_tpr:.2%}")
+
+        with m2:
+            st.metric("FPR - False Positive Rate", f"{error_detection_fpr:.2%}")
+
+        # --- LEGEND + FORMULA CARD ---
+        with m3:
+            st.markdown(
+                """
+                <div style="
+                    background-color: var(--secondary-background-color);
+                    padding:14px;
+                    border-radius:10px;
+                    border:1px solid var(--border-color, rgba(0,0,0,0.1));
+                ">
+
+                <div style="font-size:14px; font-weight:600; margin-bottom:8px;">
+                    Legend
+                </div>
+
+                <div style="margin-bottom:10px;">
+                    <span style="background-color:#ff6b6b;color:white;padding:4px 8px;border-radius:6px;font-size:12px;">
+                        Error only
+                    </span>
+                    &nbsp;
+                    <span style="background-color:#3498db;color:white;padding:4px 8px;border-radius:6px;font-size:12px;">
+                        CDC Modified
+                    </span>
+                    &nbsp;
+                    <span style="background-color:#03fc24;color:black;padding:4px 8px;border-radius:6px;font-size:12px;">
+                        Error & CDC Modified
+                    </span>
+                </div>
+
+                <div style="font-size:14px; font-weight:600; margin-bottom:6px;">
+                    Detection Formula
+                </div>
+
+                <div style="
+                    font-family:monospace;
+                    background-color: rgba(0,0,0,0.03);
+                    padding:10px;
+                    border-radius:6px;
+                    font-size:13px;
+                ">
+                    TPR = 
+                    <span style="color:#03fc24;">TP</span> / 
+                    (<span style="color:#03fc24;">TP</span> + 
+                    <span style="color:#ff6b6b;">FN</span>)
+                    <br>
+                    FPR = 
+                    <span style="color:#3498db;">FP</span> / 
+                    (<span style="color:#3498db;">FP</span> + 
+                    <span style="color:#9ca3af;">TN</span>)
+                </div>
+
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
 
         st.markdown("### Cleaned dataset")
@@ -119,16 +186,6 @@ def conformal_cleaning_ui():
             st.session_state.cleaned_dataset,
             st.session_state.error_mask,
             st.session_state.clean_mask
-        )
-        # === Legend ===
-        st.markdown(
-            """
-            **Legend:**  
-            <span style="background-color:#ff6b6b;color:white;padding:2px 6px;border-radius:3px;">Error only</span>  
-            <span style="background-color:#3498db;color:white;padding:2px 6px;border-radius:3px;">CDC Modified</span>  
-            <span style="background-color:#03fc24;color:black;padding:2px 6px;border-radius:3px;">Error & CDC Modified</span>
-            """,
-            unsafe_allow_html=True
         )
         st.dataframe(styled_df)
 

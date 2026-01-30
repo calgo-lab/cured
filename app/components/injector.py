@@ -29,12 +29,8 @@ def highlight_errors(df, mask):
 def inject_errors_ui(df):
     st.markdown("## Inject Errors With tab-err")
     description = """This part of the demo allows the user to use error models of the form: (mechanism, type, rate) to perturb the data using tab-err (https://pypi.org/project/tab-err/). 
-    Any error mechanisms or types listed will be used to perturb the table.
     To perturb the data, select an error mechanism, type, and rate and click `Inject errors`. 
     To revert to undo the errors, click `Revert to original dataset`.
-    To see a description of the various error mechanisms, click `Error mechanism descriptions`.
-    To see a description of the various error types, click `Error type descriptions`.
-    Certain error types apply only to numeric and others only to categorical columns.
     """
     
     st.markdown(
@@ -51,77 +47,115 @@ def inject_errors_ui(df):
     # if "error_mask" not in st.session_state:
     #     st.session_state.error_mask = None
 
-    # --- ERROR MECHANISM SELECTION ---
-    valid_error_mechs = {
-        "ECAR": ECAR(),
-        "EAR": EAR(),
-        "ENAR": ENAR(),
-    }
+    # --- TOP BAR ---
+    col1, col2, col3 = st.columns([1, 1, 3])
 
-    selected_mech_names = st.multiselect(
-        "Error mechanisms",
-        list(valid_error_mechs.keys()),
-        default=["EAR"]
-    )
-
-    if not selected_mech_names:
-        st.warning("Select at least one error mechanism. Defaulting to EAR.")
-        selected_mech_names = ["EAR"]
-
-    selected_mechs = [valid_error_mechs[n] for n in selected_mech_names]
-
-
-
-    # --- ERROR TYPE SELECTION ---
-    valid_error_types = {
-        "Wrong Unit": WrongUnit({"wrong_unit_scaling": lambda x: x / 1e6}),
-        "Add Delta": AddDelta(),
-        "Outlier": Outlier(),
-        "Typo": Typo(),
-        "Extraneous": Extraneous(),
-    }
-
-    selected_type_names = st.multiselect(
-        "Error types",
-        list(valid_error_types.keys()),
-        default=["Wrong Unit", "Typo"]
-    )
-
-    if not selected_type_names:
-        st.warning("Select at least one error type. Defaulting to Wrong Unit and Typo")
-        selected_type_names = ["Wrong Unit", "Typo"]
-
-    selected_types = [valid_error_types[n] for n in selected_type_names]
-
-
-
-    # --- ERROR RATE SELECTION ---
-    error_rate = st.slider(
-        "Error rate (% of cells)", min_value=0, max_value=100, value=10, step=1
-    ) /100
-
-    # --- CODE STRING ---
-    code_str = "perturbed_df, error_mask = create_errors(df, error_rate=error_rate)"
-
-    # Buttons side by side
-    col1, col2, col3, col4, col5 = st.columns(5)
     with col1:
-        inject_button = st.button("Inject errors")
+        inject_button = st.button("Inject errors", use_container_width=True)
+
     with col2:
-        revert_button = st.button("Revert to original dataset")
+        revert_button = st.button("Revert dataset", use_container_width=True)
+
+    # --- DROPDOWN CONTROL PANEL ---
     with col3:
-        with st.popover("Error mechanism descriptions"):
-            for name, desc in ERROR_MECH_DESCRIPTIONS.items():
-                st.markdown(f"**{name}**")
-                st.caption(desc)
-    with col4:
-        with st.popover("Error type descriptions"):
-            for name, desc in ERROR_TYPE_DESCRIPTIONS.items():
-                st.markdown(f"**{name}**")
-                st.caption(desc)
-    with col5:
-        with st.popover("tab-err code"):
-            st.markdown(f"```python\n{code_str}\n```")
+        with st.popover("Error settings"):
+            st.markdown("### Error Configuration")
+            error_configuration_explanation = """
+            Any error mechanisms or types listed will be used to perturb the table.
+            To see a description of the various error mechanisms, click `Error mechanism descriptions`.
+            To see a description of the various error types, click `Error type descriptions`.
+            Certain error types apply only to numeric and others only to categorical columns.
+            """
+            st.caption(error_configuration_explanation)
+
+            # -----------------------------
+            # ERROR MECHANISM SELECTION
+            # -----------------------------
+            valid_error_mechs = {
+                "ECAR": ECAR(),
+                "EAR": EAR(),
+                "ENAR": ENAR(),
+            }
+
+            selected_mech_names = st.multiselect(
+                "Error mechanisms",
+                list(valid_error_mechs.keys()),
+                default=["EAR"]
+            )
+
+            if not selected_mech_names:
+                st.warning("Select at least one error mechanism. Defaulting to EAR.")
+                selected_mech_names = ["EAR"]
+
+            selected_mechs = [valid_error_mechs[n] for n in selected_mech_names]
+
+            st.divider()
+
+            # -----------------------------
+            # ERROR TYPE SELECTION
+            # -----------------------------
+            valid_error_types = {
+                "Wrong Unit": WrongUnit({"wrong_unit_scaling": lambda x: x / 1e6}),
+                "Add Delta": AddDelta(),
+                "Outlier": Outlier(),
+                "Typo": Typo(),
+                "Extraneous": Extraneous(),
+            }
+
+            selected_type_names = st.multiselect(
+                "Error types",
+                list(valid_error_types.keys()),
+                default=["Wrong Unit", "Typo"]
+            )
+
+            if not selected_type_names:
+                st.warning("Select at least one error type. Defaulting to Wrong Unit and Typo")
+                selected_type_names = ["Wrong Unit", "Typo"]
+
+            selected_types = [valid_error_types[n] for n in selected_type_names]
+
+            st.divider()
+
+            # -----------------------------
+            # ERROR RATE
+            # -----------------------------
+            error_rate = (
+                st.slider(
+                    "Error rate (% of cells)",
+                    min_value=0,
+                    max_value=100,
+                    value=10,
+                    step=1
+                ) / 100
+            )
+
+            st.divider()
+
+            # -----------------------------
+            # DESCRIPTIONS
+            # -----------------------------
+            with st.expander("Error mechanism descriptions"):
+                for name, desc in ERROR_MECH_DESCRIPTIONS.items():
+                    st.markdown(f"**{name}**")
+                    st.caption(desc)
+
+            with st.expander("Error type descriptions"):
+                for name, desc in ERROR_TYPE_DESCRIPTIONS.items():
+                    st.markdown(f"**{name}**")
+                    st.caption(desc)
+
+            st.divider()
+
+            # -----------------------------
+            # CODE PREVIEW
+            # -----------------------------
+            code_str = f"""
+            from tab_err.api.high_level import create_errors
+
+            perturbed_df, error_mask = create_errors(df, error_rate={error_rate})"""
+            st.markdown("### Code Example")
+            st.code(code_str, language="python")
+
 
     if inject_button:
         df_copy = st.session_state.test_df.copy()        
