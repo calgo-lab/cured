@@ -48,7 +48,7 @@ def mech_detect_ui():
                     try:
                         detector = MechDetector(alpha=0.05, cv_folds=5, seed=42, n_jobs=1)
                         detected_mech, p1, p2 = detector.detect(
-                            st.session_state.clean_test_df,
+                            st.session_state.clean_test_df.drop(columns=["target"]),
                             st.session_state.error_mask,
                             column=column
                         )
@@ -76,8 +76,11 @@ def mech_detect_ui():
     # --- Display Results if available ---
     if "detected_mech" in st.session_state:
         st.subheader("Results")
-        st.markdown(f"**Detected mechanism:** `{st.session_state.detected_mech}`")
-        st.markdown(f"**Actual error mechanism:** `{st.session_state.perturbation_config.columns[st.session_state.detected_column][0].error_mechanism}`")
+        mech_col_1, mech_col_2 = st.columns(2)
+        with mech_col_1:
+            st.markdown(f"**Detected mechanism:** `{st.session_state.detected_mech}`")
+        with mech_col_2:
+            st.markdown(f"**Injected mechanism:** `{st.session_state.perturbation_config.columns[st.session_state.detected_column][0].error_mechanism.__class__.__name__}`")
 
         col1_res, col2_res = st.columns(2)
         col1_res.metric("p1", f"{st.session_state.p1:.4f}")

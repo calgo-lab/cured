@@ -2,6 +2,7 @@ import streamlit as st
 from tab_err.api.high_level import create_errors_with_config
 from tab_err.error_mechanism import ECAR, ENAR, EAR
 from tab_err.error_type import WrongUnit, Typo, Outlier, AddDelta, Extraneous
+import pandas as pd
 
 
 ERROR_MECH_DESCRIPTIONS = {
@@ -24,11 +25,29 @@ def highlight_errors(df, mask):
     css = mask.map(lambda v: "background-color: #ff6b6b" if v == 1 else "")
     return df.style.apply(lambda _: css, axis=None)
 
+def _reset_session_state():
+    keys_to_clear = [
+        # Error injection
+        "error_mask",
+        "perturbation_config",
 
+        # Conformal cleaning
+        "cleaned_dataset",
+        "clean_mask",
+
+        # MechDetect
+        "detected_mech",
+        "p1",
+        "p2",
+        "detected_column"
+    ]
+
+    for k in keys_to_clear:
+        st.session_state.pop(k, None)
 
 def inject_errors_ui(df):
     st.markdown("## Inject Errors With tab-err")
-    description = """This part of the demo allows the user to use error models of the form: (mechanism, type, rate) to perturb the data using tab-err (https://pypi.org/project/tab-err/). 
+    description = """This part of the demo allows the user to use error models of the form: (mechanism, type, rate) to perturb the features of the data using tab-err (https://pypi.org/project/tab-err/). 
     To perturb the data, select an error mechanism, type, and rate and click `Inject errors`. 
     To revert to undo the errors, click `Revert to original dataset`.
     """
@@ -158,13 +177,16 @@ def inject_errors_ui(df):
 
 
     if inject_button:
+        _reset_session_state()
         df_copy = st.session_state.test_df.copy()        
-        
+        df_copy = df_copy.drop(columns=["target"])
         # tab-err injection logic
         perturbed_df, error_mask, config = create_errors_with_config(df_copy, error_rate=error_rate, error_mechanisms_to_include=selected_mechs, error_types_to_include=selected_types, seed=1)
 
-        st.session_state.dataset = perturbed_df
-        st.session_state.error_mask = error_mask
+        st.session_state.dataset = perturbed_df # pd.concat([st.session_state.test_target_col, perturbed_df], axis=1)
+
+        st.session_state.error_mask = error_mask # pd.concat([prepend_col, error_mask], axis=1)
+
         st.session_state.perturbation_config = config
         if error_mask.any().any():
             st.success(f"Injected errors at {error_rate * 100}%.")
@@ -172,7 +194,7 @@ def inject_errors_ui(df):
             st.error("Choose a larger error rate.")
 
     if revert_button:
-        st.session_state.dataset = st.session_state.test_df.copy()
+        st.session_state.dataset = st.session_state.test_df.drop(columns=["target"]).copy()
         st.session_state.error_mask = None
         st.success("Reverted to original dataset.")
         revert_button = None
@@ -188,4 +210,4 @@ def inject_errors_ui(df):
         
         st.dataframe(styled)
     else:
-        st.dataframe(st.session_state.dataset)
+        st.dataframe(st.session_state.test_df.drop(columns=["target"]))

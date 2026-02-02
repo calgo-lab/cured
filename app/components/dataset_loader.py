@@ -25,6 +25,8 @@ def _reset_dataset_state():
         "test_df",
         "clean_test_df",
         "original_dataset",
+        "train_target_col",
+        "test_target_col",
 
         # Error injection
         "error_mask",
@@ -38,7 +40,6 @@ def _reset_dataset_state():
     for k in keys_to_clear:
         st.session_state.pop(k, None)
 
-
 def _split_and_store(df, train_frac=0.8, seed=42):
     train_df, test_df = train_test_split(
         df,
@@ -51,6 +52,8 @@ def _split_and_store(df, train_frac=0.8, seed=42):
     st.session_state.train_df = train_df.reset_index(drop=True)
     st.session_state.test_df = test_df.reset_index(drop=True)
     st.session_state.clean_test_df = copy.deepcopy(test_df)
+    st.session_state.train_target_col = train_df["target"]
+    st.session_state.test_target_col = test_df["target"]
     return train_df, test_df
 
 
@@ -74,20 +77,19 @@ def load_dataset():
 
     st.markdown("---")
 
-    st.markdown("### Option A - Use an example dataset")
-    st.caption(
-        "Loads a dataset with the OpenML ID: 44969 subsampled to 8 columns."
-    )
-
-    load_dummy = st.button("Load dummy dataset", use_container_width=True)
-
-    st.markdown("### Option B - Upload a file")
+    st.markdown("### Option A - Upload a file")
     uploaded = st.file_uploader(  # Can configure size using server.maxUploadSize
         "Supports CSV and Excel (.xlsx) files",
         type=["csv", "xlsx"],
         key="uploader"
     )
 
+    st.markdown("### Option B - Use an example dataset")
+    st.caption(
+        "Loads a dataset with the OpenML ID: 44969 subsampled to 8 columns."
+    )
+
+    load_dummy = st.button("Load dummy dataset", use_container_width=True)
 
     test = None
 
@@ -136,7 +138,7 @@ def load_dataset():
             df[int_cols] = df[int_cols].astype("float")
 
             train, test = _split_and_store(df)
-            st.success("New dataset loaded and session state reset.")
+            st.success("Dataset loaded.")
 
 
     if load_dummy:
