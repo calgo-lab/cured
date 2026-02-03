@@ -156,7 +156,7 @@ def conformal_cleaning_ui():
                     metric_val = root_mean_squared_error(y_t, preds)
                 results.append({"Dataset": name, metric_name: metric_val})
 
-            ml_task_summary = pd.DataFrame(results)
+            st.session_state.ml_task_summary = pd.DataFrame(results)
 
         st.session_state.cleaned_dataset = cleaned_df
         st.session_state.clean_mask = mask
@@ -221,7 +221,7 @@ def conformal_cleaning_ui():
 
         # --- BLOCK 2: Downstream ML Performance ---
         # Determine metric name dynamically for the header
-        metric_key = "RMSE" if "RMSE" in ml_task_summary.columns else "F1 Score (Weighted)"
+        metric_key = "RMSE" if "RMSE" in st.session_state.ml_task_summary.columns else "F1 Score (Weighted)"
         
         # Explicit Text Header
         st.markdown(f"#### Downstream Model Performance: {metric_key}")
@@ -233,7 +233,7 @@ def conformal_cleaning_ui():
 
         # Helper to safe-get data
         def get_metric(idx):
-            return ml_task_summary.iloc[idx] if idx < len(ml_task_summary) else None
+            return st.session_state.ml_task_summary.iloc[idx] if idx < len(st.session_state.ml_task_summary) else None
 
         for i, col in enumerate(cols):
             row_data = get_metric(i)

@@ -34,6 +34,7 @@ def _reset_session_state():
         # Conformal cleaning
         "cleaned_dataset",
         "clean_mask",
+        "ml_task_summary"
 
         # MechDetect
         "detected_mech",
