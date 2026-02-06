@@ -3,10 +3,58 @@ import pandas as pd
 import hashlib
 from sklearn.model_selection import train_test_split
 import copy
+import re
 
 
+# Hard limits based on container resources
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB limit
 MAX_ROWS = 10_000
-MAX_COLS = 10
+MAX_COLS = 50
+
+def load_data_securely(uploaded_file):
+    if uploaded_file is None:
+        return None
+
+    # 1. Size Check (Prevent Disk/RAM DoS before parsing)
+    if uploaded_file.size > MAX_FILE_SIZE:
+        st.error("File size exceeds 10MB limit.")
+        st.stop()
+
+    try:
+        if uploaded_file.name.endswith('.csv'):
+            # 2. Limit Columns + Rows + Engine
+            # Explicitly use 'c' engine for speed or 'python' for stability
+            df = pd.read_csv(
+                uploaded_file, 
+                nrows=MAX_ROWS, 
+                usecols=lambda x: x not in range(MAX_COLS, 1000), # Cap wide-column attacks
+            )
+                
+        elif uploaded_file.name.endswith('.xlsx'):
+            # 3. XLSX specific: openpyxl + row/col limits
+            # Note: Pandas doesn't support nrows with read_excel directly in all versions
+            df = pd.read_excel(uploaded_file, engine='openpyxl').iloc[:MAX_ROWS, :MAX_COLS]
+            
+        else:
+            st.error("Unsupported file type.")
+            st.stop()
+
+        # 4. Sanitization (Hardened Regex for CSV Injection)
+        # Prevents leading characters that trigger Excel/Sheets execution
+        if not df.empty:
+            trigger_pattern = re.compile(r"^[=\+\-\@\t\r]")
+            cols = df.select_dtypes(include=['object']).columns
+            for col in cols:
+                df[col] = df[col].astype(str).apply(
+                    lambda x: f"'{x}" if trigger_pattern.match(x) else x
+                )
+
+        return df
+
+    except Exception as e:
+        # 5. Generic error to prevent info leakage (paths, versions, etc.)
+        st.error(f"Unable to parse file. Examine the number of columns and rows. {e}")
+        st.stop()
 
 def _file_hash(file) -> str:
     """
@@ -101,11 +149,7 @@ def load_dataset():
             _reset_dataset_state()
             st.session_state.dataset_hash = current_hash
 
-            df = (
-                pd.read_csv(uploaded)
-                if uploaded.name.endswith(".csv")
-                else pd.read_excel(uploaded)
-            )
+            df = load_data_securely(uploaded)
 
             # --- ROW SUBSAMPLE ---
             if len(df) > MAX_ROWS:

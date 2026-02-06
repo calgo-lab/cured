@@ -1,6 +1,7 @@
 # app/components/mech_detect.py
 import streamlit as st
 import pandas as pd
+import numpy as np
 from mechdetect import MechDetector
 
 # Import your MechDetect class when ready
@@ -21,6 +22,12 @@ def mech_detect_ui():
     if "dataset" not in st.session_state or st.session_state.dataset is None:
         st.warning("No dataset loaded. Go back to the main page to load one.")
         return
+
+    if "detected_mech" not in st.session_state:
+        st.session_state.detected_mech = None
+    
+    if "detected_column" not in st.session_state:
+        st.session_state.detected_column = None
 
     df = st.session_state.dataset
 
@@ -57,6 +64,8 @@ def mech_detect_ui():
                         st.session_state.p1 = p1
                         st.session_state.p2 = p2
                         st.session_state.detected_column = column
+                        
+ 
 
                     except Exception as e:
                         st.error(f"Error running MechDetect: {e}")
@@ -68,13 +77,16 @@ def mech_detect_ui():
     detector = MechDetector(alpha=0.05, cv_folds=5)
     detected_mech, p1, p2 = detector.detect(test_df, error_mask, column)
     """
+    if "p1" in st.session_state and st.session_state.p1 is not None and np.isnan(st.session_state.p1):
+        st.error("Dataset is too small to run MechDetect")
+        st.stop()
 
     with col2:
         with st.expander("Code Example"):
             st.code(mechdetect_code, language="python")
 
     # --- Display Results if available ---
-    if "detected_mech" in st.session_state:
+    if st.session_state.detected_mech is not None and st.session_state.detected_column is not None:
         st.subheader("Results")
         mech_col_1, mech_col_2 = st.columns(2)
         with mech_col_1:

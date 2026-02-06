@@ -49,7 +49,7 @@ def _reset_session_state():
 def inject_errors_ui(df):
     st.markdown("## Inject Errors With tab-err")
     description = """This part of the demo allows the user to use error models of the form: (mechanism, type, rate) to perturb the features of the data using tab-err (https://pypi.org/project/tab-err/). 
-    To perturb the data, select an error mechanism, type, and rate and click `Inject errors`. 
+    To perturb the data, select an error mechanism, type, and rate and click `Inject errors`. Perturbed cells will be highlighted red.
     To revert to undo the errors, click `Revert to original dataset`.
     """
     

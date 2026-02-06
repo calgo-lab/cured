@@ -21,11 +21,11 @@ def highlight_errors(df, error_mask, clean_mask):
         error_locations = error_mask.iloc[row, col]
         cleaning_locations = clean_mask.iloc[row, col]
         if error_locations and cleaning_locations:
-            return "background-color: #03fc24"  # green - cleaned and there was an error
+            return "background-color: #008b74"  # teal - cleaned and there was an error
         elif error_locations:
             return "background-color: #ff6b6b"  # red - error
         elif cleaning_locations:
-            return "background-color: #3498db"  # blue - cleaned but no error
+            return "background-color: #85c1e9"  # blue - cleaned but no error
         else:
             return ""
     
@@ -203,13 +203,13 @@ def conformal_cleaning_ui():
                     &nbsp;
                     <span style="background-color:#3498db;color:white;padding:4px 8px;border-radius:6px;font-size:12px;">CDC Modified</span>
                     &nbsp;
-                    <span style="background-color:#03fc24;color:black;padding:4px 8px;border-radius:6px;font-size:12px;">Both</span>
+                    <span style="background-color:#008b74;color:white;padding:4px 8px;border-radius:6px;font-size:12px;">Error and Modified</span>
                 </div>
 
                 <div style="font-size:14px; font-weight:600; margin-bottom:6px;">Detection Formula</div>
 
                 <div style="font-family:monospace; background-color: rgba(0,0,0,0.03); padding:10px; border-radius:6px; font-size:13px;">
-                    TPR = <span style="color:#03fc24;">TP</span> / (<span style="color:#03fc24;">TP</span> + <span style="color:#ff6b6b;">FN</span>)<br>
+                    TPR = <span style="color:#03fc2008b744;">TP</span> / (<span style="color:#008b74;">TP</span> + <span style="color:#ff6b6b;">FN</span>)<br>
                     FPR = <span style="color:#3498db;">FP</span> / (<span style="color:#3498db;">FP</span> + <span style="color:#9ca3af;">TN</span>)
                 </div>
                 </div>
@@ -221,7 +221,7 @@ def conformal_cleaning_ui():
 
         # --- BLOCK 2: Downstream ML Performance ---
         # Determine metric name dynamically for the header
-        metric_key = "RMSE" if "RMSE" in st.session_state.ml_task_summary.columns else "F1 Score (Weighted)"
+        metric_key = "RMSE" if "RMSE" in st.session_state.ml_task_summary.columns else "F1-Score"
         
         # Explicit Text Header
         st.markdown(f"#### Downstream Model Performance: {metric_key}")
