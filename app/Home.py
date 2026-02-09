@@ -9,10 +9,10 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-st.set_page_config(page_title="error-demo", layout="wide")
+st.set_page_config(page_title="Error Demo", layout="centered", initial_sidebar_state="expanded")
 
-st.title("<Paper title goes here>")
-st.caption("Tabular Error Injection, Cleaning, & Characterization Demo")
+st.title("Generating, Cleaning, and Characterizing Realistic Errors in Tables")
+st.caption("Tabular Error Generation, Cleaning, & Characterization Demo")
 
 description = """This demo shows how tabular data can be errored, cleaned, and characterized. It brings together the results of three works on error generation, conformal data cleaning, and error mechanism detection which are explored in detail in the following papers:
 1. [Towards Realistic Error Models for Tabular Data](https://doi.org/10.1145/3774914)
@@ -24,11 +24,3 @@ The user can proceed by uploading a dataset (or using the built-in dataset), per
 
 st.markdown("## Description")
 st.markdown(description)
-
-load_dataset()
-
-if st.session_state.test_df is not None:
-    st.markdown("## Dataset Preview")
-    st.dataframe(st.session_state.test_df)
-else:
-    st.info("Upload a CSV or load the built-in dataset to begin.")

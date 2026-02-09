@@ -134,7 +134,7 @@ def load_dataset():
 
     st.markdown("### Option B - Use an example dataset")
     st.caption(
-        "Loads a dataset with the OpenML ID: 44969 subsampled to 8 columns."
+        "Loads a dataset with the OpenML ID 44969 subsampled to 8 columns with abbreviated names. More info on OpenML."
     )
 
     load_dummy = st.button("Load dummy dataset", use_container_width=True)
@@ -202,8 +202,19 @@ def load_dataset():
 
 
 def load_dummy_dataset():
+    rename_map = {
+        "port_propeller_torque": "prt_trq",
+        "fuel_flow": "fuel",
+        "starboard_propeller_torque": "stb_trq",
+        "lever_position": "lev_pos",
+        "gas_turbine_shaft_torque": "gt_trq",
+        "gas_turbine_rate_of_revolutions": "gt_rpm",
+        "turbine_injecton_control": "inj_ctl",
+        "target": "target"  # Kept as requested
+    }
     dummy_data = pd.read_csv("data/44969.csv").drop(columns=["ship_speed", "gas_generator_rate_of_revolutions", "hp_turbine_exit_pressure", "gt_compressor_outlet_air_pressure", "gt_compressor_outlet_air_temperature", "gas_turbine_exhaust_gas_pressure", "hp_turbine_exit_temperature"]) # .sample(200)
-    
+    dummy_data = dummy_data.rename(columns=rename_map)
+
     # Reorder columns
     cols = ["target"] + [c for c in dummy_data.columns if c != "target"]
     dummy_data = dummy_data[cols]

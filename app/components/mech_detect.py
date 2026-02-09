@@ -37,7 +37,8 @@ def mech_detect_ui():
     the performance of these models is compared using statistical tests to detect mechanism as shown [here](https://github.com/calgo-lab/MechDetect/blob/MechDetect%2B%2B/src/mechdetect.py). 
     The column used to detect the error is selected, and after running MechDetect, the classified error mechanism is provided along with the actual error mechanism and the two p-values from MechDetect's internal tests (for more details, see the [paper](https://arxiv.org/abs/2512.04138)).
     """
-    st.markdown(description)
+    with st.expander("Description", expanded=True):
+        st.markdown(description)
 
     # Let the user select a column
     columns = [col for col in df.columns if col != "target"]

@@ -69,11 +69,12 @@ def conformal_clean(
 
 def conformal_cleaning_ui():
     st.markdown("## Conformal Data Cleaning")
-    st.markdown(
-        "Clean injected errors using a conformal predictor with coverage guarantees and evaluate cleaning with a downstream ML task as in [this paper](https://proceedings.mlr.press/v238/jager24a.html). "
-        "The confidence level affects the coverage of the conformal predictor, with higher confidence levels being more conservative; a value of 0.9 or higher is recommended. "
-        "Additionally, a comparison of model performance on the original data, the perturbed data, and the cleaned data is conducted."
-    )
+    with st.expander("Description", expanded=True):
+        st.markdown(
+            "Clean injected errors using a conformal predictor with coverage guarantees and evaluate cleaning with a downstream ML task as in [this paper](https://proceedings.mlr.press/v238/jager24a.html). "
+            "The confidence level affects the coverage of the conformal predictor, with higher confidence levels being more conservative; a value of 0.9 or higher is recommended. "
+            "Additionally, a comparison of model performance on the original data, the perturbed data, and the cleaned data is conducted."
+        )
 
     if "cleaned_dataset" not in st.session_state:
         st.session_state.cleaned_dataset = None
@@ -94,7 +95,7 @@ def conformal_cleaning_ui():
     """
     
     with col1:
-        clean_button = st.button("Run conformal cleaning")
+        clean_button = st.button("Run Conformal Cleaning")
     with col2:
         task_type = st.radio(
             "Select Task Type:",

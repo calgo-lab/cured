@@ -48,14 +48,12 @@ def _reset_session_state():
 
 def inject_errors_ui(df):
     st.markdown("## Inject Errors With tab-err")
-    description = """This part of the demo allows the user to use error models of the form: (mechanism, type, rate) to perturb the features of the data using tab-err (https://pypi.org/project/tab-err/). 
+    description = """This part of the demo allows the user to use error models of the form: (mechanism, type, rate) to perturb the features of the data using [tab-err](https://pypi.org/project/tab-err/). 
     To perturb the data, select an error mechanism, type, and rate and click `Inject errors`. Perturbed cells will be highlighted red.
     To revert to undo the errors, click `Revert to original dataset`.
     """
-    
-    st.markdown(
-        description
-    )
+    with st.expander("Description", expanded=True):
+        st.markdown(description)   
 
     # Initialize original dataset
     if "original_dataset" not in st.session_state:
@@ -71,14 +69,14 @@ def inject_errors_ui(df):
     col1, col2, col3 = st.columns([1, 1, 3])
 
     with col1:
-        inject_button = st.button("Inject errors", use_container_width=True)
+        inject_button = st.button("Inject Errors", use_container_width=True)
 
     with col2:
-        revert_button = st.button("Revert dataset", use_container_width=True)
+        revert_button = st.button("Revert Dataset", use_container_width=True)
 
     # --- DROPDOWN CONTROL PANEL ---
     with col3:
-        with st.popover("Error settings"):
+        with st.popover("Error Settings"):
             st.markdown("### Error Configuration")
             error_configuration_explanation = """
             Any error mechanisms or types listed will be used to perturb the table.
@@ -98,7 +96,7 @@ def inject_errors_ui(df):
             }
 
             selected_mech_names = st.multiselect(
-                "Error mechanisms",
+                "Error Mechanisms",
                 list(valid_error_mechs.keys()),
                 default=["EAR"]
             )
@@ -123,13 +121,13 @@ def inject_errors_ui(df):
             }
 
             selected_type_names = st.multiselect(
-                "Error types",
+                "Error Types",
                 list(valid_error_types.keys()),
                 default=["Wrong Unit", "Typo"]
             )
 
             if not selected_type_names:
-                st.warning("Select at least one error type. Defaulting to Wrong Unit and Typo")
+                st.warning("Select at least one error type. Defaulting to Wrong Unit and Typo.")
                 selected_type_names = ["Wrong Unit", "Typo"]
 
             selected_types = [valid_error_types[n] for n in selected_type_names]
@@ -154,12 +152,12 @@ def inject_errors_ui(df):
             # -----------------------------
             # DESCRIPTIONS
             # -----------------------------
-            with st.expander("Error mechanism descriptions"):
+            with st.expander("Error Mechanism Descriptions"):
                 for name, desc in ERROR_MECH_DESCRIPTIONS.items():
                     st.markdown(f"**{name}**")
                     st.caption(desc)
 
-            with st.expander("Error type descriptions"):
+            with st.expander("Error Type Descriptions"):
                 for name, desc in ERROR_TYPE_DESCRIPTIONS.items():
                     st.markdown(f"**{name}**")
                     st.caption(desc)
