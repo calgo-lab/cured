@@ -4,21 +4,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: error-demo
+  name: cured
   namespace: calgo-lab
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: error-demo
+      app: cured
   template:
     metadata:
       labels:
-        app: error-demo
+        app: cured
     spec:
       containers:
-        - name: error-demo
-          image: chandlernick/error-demo:latest
+        - name: cured
+          image: chandlernick/cured:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8501
@@ -45,12 +45,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: error-demo-service
+  name: cured-service
   namespace: calgo-lab
 spec:
   type: ClusterIP
   selector:
-    app: error-demo
+    app: cured
   ports:
     - name: ui
       protocol: TCP
@@ -65,7 +65,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: error-demo-ingress
+  name: cured-ingress
   namespace: calgo-lab
   annotations:
     # Forward large requests if needed
@@ -84,7 +84,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: error-demo-service
+                name: cured-service
                 port:
                   name: ui
   tls:

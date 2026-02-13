@@ -7,6 +7,12 @@ from mechdetect import MechDetector
 # Import your MechDetect class when ready
 # from mechdetect import MechDetector
 
+MECHDETECT_CODE = """from mechdetect import MechDetector
+
+detector = MechDetector(alpha=0.05, cv_folds=5)
+
+detected_mech, p1, p2 = detector.detect(test_df, error_mask, column)"""
+
 def highlight_errors(df: pd.DataFrame, mask: pd.DataFrame):
     """
     Highlight errored cells in a dataframe using a CSS style.
@@ -72,19 +78,14 @@ def mech_detect_ui():
                         st.error(f"Error running MechDetect: {e}")
 
     # --- MechDetect Code Example ---
-    mechdetect_code = """
-    from mechdetect import MechDetector
 
-    detector = MechDetector(alpha=0.05, cv_folds=5)
-    detected_mech, p1, p2 = detector.detect(test_df, error_mask, column)
-    """
     if "p1" in st.session_state and st.session_state.p1 is not None and np.isnan(st.session_state.p1):
         st.error("Dataset is too small to run MechDetect")
         st.stop()
 
     with col2:
         with st.expander("Code Example"):
-            st.code(mechdetect_code, language="python")
+            st.code(MECHDETECT_CODE, language="python")
 
     # --- Display Results if available ---
     if st.session_state.detected_mech is not None and st.session_state.detected_column is not None:

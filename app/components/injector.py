@@ -1,9 +1,8 @@
 import streamlit as st
 from tab_err.api.high_level import create_errors_with_config
 from tab_err.error_mechanism import ECAR, ENAR, EAR
-from tab_err.error_type import WrongUnit, Typo, Outlier, AddDelta, Extraneous
+from tab_err.error_type import WrongUnit, Typo, Outlier, AddDelta, Extraneous, Replace
 import pandas as pd
-
 
 ERROR_MECH_DESCRIPTIONS = {
         "ECAR": "Locations of errors are not dependent on the data in the table.",
@@ -34,7 +33,7 @@ def _reset_session_state():
         # Conformal cleaning
         "cleaned_dataset",
         "clean_mask",
-        "ml_task_summary"
+        "ml_task_summary",
 
         # MechDetect
         "detected_mech",
@@ -118,6 +117,7 @@ def inject_errors_ui(df):
                 "Outlier": Outlier(),
                 "Typo": Typo(),
                 "Extraneous": Extraneous(),
+                "Replace": Replace()
             }
 
             selected_type_names = st.multiselect(
@@ -167,10 +167,7 @@ def inject_errors_ui(df):
             # -----------------------------
             # CODE PREVIEW
             # -----------------------------
-            code_str = f"""
-            from tab_err.api.high_level import create_errors
-
-            perturbed_df, error_mask = create_errors(df, error_rate={error_rate})"""
+            code_str = f"from tab_err.api.high_level import create_errors\n\nperturbed_df, error_mask = create_errors(df, error_rate={error_rate})"
             st.markdown("### Code Example")
             st.code(code_str, language="python")
 

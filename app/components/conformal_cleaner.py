@@ -7,6 +7,13 @@ from conformal_data_cleaning.cleaner import ConformalForestCleaner
 from catboost import CatBoostClassifier, CatBoostRegressor
 from sklearn.metrics import root_mean_squared_error, f1_score
 
+
+CODE_STR = """from conformal_data_cleaning.cleaner import ConformalForestCleaner
+
+cleaner = ConformalForestCleaner(train_df, confidence_level)
+    
+cleaned_test_df, cleaned_mask = cleaner.transform(test_df)"""
+
 def highlight_errors(df, error_mask, clean_mask):
     """
     df: DataFrame
@@ -86,14 +93,7 @@ def conformal_cleaning_ui():
     )
 
     col1, col2, col3 = st.columns(3)
-    code_str = """
-    from conformal_data_cleaning.cleaner import ConformalForestCleaner
 
-    cleaner = ConformalForestCleaner(train_df, confidence_level)
-    
-    cleaned_test_df, cleaned_mask = cleaner.transform(test_df)
-    """
-    
     with col1:
         clean_button = st.button("Run Conformal Cleaning")
     with col2:
@@ -106,7 +106,7 @@ def conformal_cleaning_ui():
         )
     with col3:
         with st.expander("Code Example"):
-            st.code(code_str, language="python")
+            st.code(CODE_STR, language="python")
 
     if clean_button:
         with st.spinner("Running conformal cleaner..."):
