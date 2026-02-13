@@ -11,7 +11,7 @@ if str(SRC) not in sys.path:
 
 st.set_page_config(page_title="Error Demo", layout="centered", initial_sidebar_state="expanded")
 
-st.title("Generating, Cleaning, and Characterizing Realistic Errors in Tables")
+st.title("CURED: Creating, Understanding, and Repairing Errors Demonstrator")
 st.caption("Tabular Error Generation, Cleaning, & Characterization Demo")
 
 description = """This demo shows how tabular data can be errored, cleaned, and characterized. It brings together the results of three works on error generation, conformal data cleaning, and error mechanism detection which are explored in detail in the following papers:

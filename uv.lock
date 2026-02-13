@@ -719,7 +719,6 @@ requires-dist = [
     { name = "itables" },
     { name = "mechdetect", git = "https://github.com/calgo-lab/MechDetect.git?rev=d91ffc1" },
     { name = "numpy", specifier = ">=2.0.2" },
-    { name = "openml" },
     { name = "openml", specifier = ">=0.15.1" },
     { name = "openpyxl" },
     { name = "pandas", specifier = ">=2.3.3" },

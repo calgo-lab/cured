@@ -1,0 +1,94 @@
+# ==============================================================
+# Deployment
+# ==============================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: error-demo
+  namespace: calgo-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: error-demo
+  template:
+    metadata:
+      labels:
+        app: error-demo
+    spec:
+      containers:
+        - name: error-demo
+          image: chandlernick/error-demo:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8501
+          env:
+            - name: STREAMLIT_SERVER_HEADLESS
+              value: "true"
+            - name: STREAMLIT_SERVER_PORT
+              value: "8501"
+            - name: STREAMLIT_SERVER_ADDRESS
+              value: "0.0.0.0"
+          # Resources added for stability in a shared lab environment
+          resources:
+            requests:
+              cpu: "8000m"
+              memory: "8Gi"
+            limits:
+              cpu: "8000m"
+              memory: "8Gi"
+---
+
+# ==============================================================
+# Service
+# ==============================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: error-demo-service
+  namespace: calgo-lab
+spec:
+  type: ClusterIP
+  selector:
+    app: error-demo
+  ports:
+    - name: ui
+      protocol: TCP
+      port: 80          # exposed internally in the cluster
+      targetPort: 8501  # Streamlit container port
+
+---
+
+# ==============================================================
+# Ingress
+# ==============================================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: error-demo-ingress
+  namespace: calgo-lab
+  annotations:
+    # Forward large requests if needed
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    # Optional: allow long-running Streamlit sessions
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3601"
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: cured.demo.calgo-lab.de
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: error-demo-service
+                port:
+                  name: ui
+  tls:
+  - hosts:
+    - "cured.demo.calgo-lab.de"
+    secretName: "cured-demo-ingress"
+
