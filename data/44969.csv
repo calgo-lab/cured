@@ -1,4 +1,4 @@
-lever_position,ship_speed,gas_turbine_shaft_torque,gas_turbine_rate_of_revolutions,gas_generator_rate_of_revolutions,starboard_propeller_torque,port_propeller_torque,hp_turbine_exit_temperature,gt_compressor_outlet_air_temperature,hp_turbine_exit_pressure,gt_compressor_outlet_air_pressure,gas_turbine_exhaust_gas_pressure,turbine_injecton_control,fuel_flow,gt_compressor_decay_state_coefficient
+lever_position,ship_speed,gas_turbine_shaft_torque,gas_turbine_rate_of_revolutions,gas_generator_rate_of_revolutions,starboard_propeller_torque,port_propeller_torque,hp_turbine_exit_temperature,gt_compressor_outlet_air_temperature,hp_turbine_exit_pressure,gt_compressor_outlet_air_pressure,gas_turbine_exhaust_gas_pressure,turbine_injecton_control,fuel_flow,target
 1.138,3,289.964,1349.489,6677.38,7.584,7.584,464.006,550.563,1.096,5.947,1.019,7.137,0.082,0.95
 2.088,6,6960.18,1376.166,6828.469,28.204,28.204,635.401,581.658,1.331,7.282,1.019,10.655,0.287,0.95
 3.144,9,8379.229,1386.757,7111.811,60.358,60.358,606.002,587.587,1.389,7.574,1.02,13.086,0.259,0.95
