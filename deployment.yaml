@@ -92,3 +92,8 @@ spec:
     - "cured.demo.calgo-lab.de"
     secretName: "cured-demo-ingress"
 
+# Command:
+# export GITHUB_TOKEN=<token>
+# docker build --secret id=gh_token,env=GITHUB_TOKEN -t chandlernick/cured:latest . && docker push chandlernick/cured:latest && kubectl apply -f deployment.yaml -n calgo-lab
+
+
